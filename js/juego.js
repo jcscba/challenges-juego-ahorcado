@@ -4,25 +4,23 @@
 	var botonIniciarjuego = document.querySelector("#iniciar-juego");
 	var agregarPalabra = document.querySelector("#input-nueva-palabra");	
 	agregarPalabra.focus();
-
-
+	var juegoFinalizado;
 	botonAgregarPalabra.addEventListener("click",function(event){
 		event.preventDefault();
 		var texto = agregarPalabra.value;
 		var valido = texto.match(/[a-zA-Z]/);
 		if(!valido)
-			console.log("Ingrese una palabra");
+			alert("Ingrese una palabra valida");
 		else
 			palabras.push(texto.toUpperCase());
+			agregarPalabra.value = [];
 	});
 
 	var palabra = []; // seleeciono una palabra del array que sera para adivinar
-
 	var letrasingresadas = [];
 	var letrasincorrectas = [];
 	var letrascorrectas = [];
 	
-
 	botonIniciarjuego.addEventListener("click",function(event){
 		iniciarJuego();
 		palabra = palabras[sortearPalabra(palabras.length)];
@@ -30,55 +28,60 @@
 		letrasingresadas = [];
 		letrasincorrectas = [];
 		letrascorrectas = [];
+		juegoFinalizado = false;
 		juegoIniciado();
-		
 	});
 
-	function juegoIniciado(){
+function juegoIniciado(){
 
-	addEventListener('keypress', function(event){   // funcion para capturar las letra digitadas en el teclado
+		var code;
+		botonIniciarjuego.addEventListener('keypress', function(event){   // funcion para capturar las letra digitadas en el teclado
+		code = ((String.fromCharCode(event.charCode)));
 
-		var code = ((String.fromCharCode(event.charCode))); 
 		var repetida = false;
-
 		if (code.match(/[a-zA-Z]/) != null ) {
 			code = code.toUpperCase();
-
 			for(var i=0; i<letrasingresadas.length; i++){
-				
 				if(code == letrasingresadas[i])
 					repetida = true;
 			}
-
-			if (repetida == false) {
-
+						
+			if (repetida == false && juegoFinalizado == false) {
 				letrasingresadas.push(code);	
 				var posicion = buscarletra(code, palabra);
-				
-				if(posicion.length>0){
-					for(var i=0; i < posicion.length ;i++){
-						letrascorrectas.push(palabra[posicion[i]]);
-					}		
-					if(letrascorrectas.length == palabra.length){
-						dibujarletras ( "green", '20px serif', 'Ganaste Felicitaciones!',500,250,200);
-						event.preventDefault();
-					}
+				if(posicion.length>0)
+						letraCorrecta(code, posicion);
+					else
+						letraIncorrecta(code);						
 				}
-				
-				else{
-					letrasincorrectas.push(code);
-					dibujarletras( "black", '40px serif', code, (400+(35)*letrasincorrectas.length), 300, 40);
-					dibujarAhorcado(letrasincorrectas.length);
-					if(letrasincorrectas.length == 9){
-						dibujarletras ( "red", '20px serif', 'Fin del Juego!',500,250,200);;
-						event.preventDefault();
-						}
-					}
-			}
-		}
-		}, true);
+			}			
+		
+	});
+	}
+
+	function letraCorrecta(code, posicion){
+		for(var i=0; i < posicion.length ;i++){
+			letrascorrectas.push(palabra[posicion[i]]);
+			}		
+		if(letrascorrectas.length == palabra.length){
+			dibujarletras ( "green", '20px serif', 'Ganaste Felicitaciones!',500,200,200);
+			juegoFinalizado = true;
+			}	
 	}	
 
+
+	function letraIncorrecta(code){
+
+		letrasincorrectas.push(code);
+		dibujarletras( "black", '40px serif', code, (400+(35)*letrasincorrectas.length), 300, 40);
+		dibujarAhorcado(letrasincorrectas.length);
+		if(letrasincorrectas.length == 9){
+			dibujarletras ("red", '20px serif', 'Fin del Juego!',500,200,200);
+			dibujarletras ("red", '20px serif', 'La palabra es '+ palabra,500,250,200);
+			juegoFinalizado = true;
+			}
+	}
+	
 	function dibujarAhorcado(error){
 		switch(error){
 					case 1:
@@ -108,7 +111,6 @@
 					case 9:
 						pieizquierdo();
 						break;
-
 		}
 	}
 
@@ -125,10 +127,13 @@
 		}
 		return posicion;
 	}	
-					
+	
+
+
 	function sortearPalabra(total) {	
 			return Math.floor(Math.random()*total);
 	}
+
 
 	function dibujarLineas(cantidadLetras) {
 		var x = 150;

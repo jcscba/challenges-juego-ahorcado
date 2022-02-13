@@ -3,7 +3,6 @@
   padding: 15px;
   width: 30vw;
   margin: auto;
-
 }
 
 .btn {
@@ -27,3 +26,22 @@
   margin-left: auto;
   margin-right: auto;
 }
+
+.fondo-pagina{
+  background: linear-gradient(
+    135deg,
+    #F5C476,
+    #BC8022,
+    #916219,
+    #7D4D03);
+     
+}
+
+footer{
+    background-color: gray;
+    text-align: right;
+   }
+
+.p {
+    margin: 5%;
+  }
